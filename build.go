@@ -19,6 +19,15 @@ const (
 	filepathOfUnalignedAPK           = "app.apk.unaligned"
 )
 
+// Descriptions of flags with corresponding names:
+const (
+	sdkDesc      = "The location of the Android SDK to use in lieu of the environment variable $ANDROID_HOME (default)"
+	manifestDesc = "The location of the AndroidManifest.xml of the app to build in lieu of the current directory (default)"
+	xmlDesc      = "The parent-folder location of XML resources files (commonly named 'res') to use in lieu of a folder named 'xml' within the current directory (default)"
+	javaDesc     = "The parent-folder location Java source files for the app to use in lieu of a folder named 'java' within the current directory (default)"
+	outDesc      = "The directory to output temporary built artifacts and final APK file, in lieu of the current directory"
+)
+
 func main() {
 	args := struct {
 		androidHome             string
@@ -27,11 +36,11 @@ func main() {
 		javaSourcesFilepath     string
 		outputDir               string
 	}{}
-	flag.StringVar(&args.androidHome, "sdk", "", "The location of the Android SDK to use in lieu of the environment variable $ANDROID_HOME (default)")
-	flag.StringVar(&args.androidManifestFilepath, "manifest", "AndroidManifest.xml", "The location of the AndroidManifest.xml of the app to build in lieu of the current directory (default)")
-	flag.StringVar(&args.xmlResourcesFilepath, "xml", "xml", "The parent-folder location of XML resources files (commonly 'res') to use in lieu of a folder named 'xml' within the current directory (default)")
-	flag.StringVar(&args.javaSourcesFilepath, "java", "java", "The parent-folder location Java source files for the app to use in lieu of a folder named 'java' within the current directory (default)")
-	flag.StringVar(&args.outputDir, "out", "", "The directory to output temporary built artifacts and final APK file, in lieu of the current directory")
+	flag.StringVar(&args.androidHome, "sdk", "", sdkDesc)
+	flag.StringVar(&args.androidManifestFilepath, "manifest", "AndroidManifest.xml", manifestDesc)
+	flag.StringVar(&args.xmlResourcesFilepath, "xml", "xml", xmlDesc)
+	flag.StringVar(&args.javaSourcesFilepath, "java", "java", javaDesc)
+	flag.StringVar(&args.outputDir, "out", "", outDesc)
 	flag.Parse()
 	if args.androidHome == "" {
 		var envExists bool

@@ -19,5 +19,3 @@ bustler-on-unix:
 		-manifest "$$projectLocationOnUnix/AndroidManifest.xml" \
 		-xml "$$projectLocationOnUnix/xml" \
 		-java "$$projectLocationOnUnix/java"
-
-
