@@ -8,14 +8,14 @@ sdkLocationOnUnix="/home/aoeu/android"
 
 bustler-on-winows-with-WSL:
 	go run build.go \
-		-sdk "$$sdkLocationOnWSL" \
-		-manifest "$$projectLocationOnWindows/AndroidManifest.xml" \
-		-xml "$$projectLocationOnWindows/xml" \
-		-java "$$projectLocationOnWindows/java"
+		-sdk "$(sdkLocationOnWSL)" \
+		-manifest "$(projectLocationOnWindows)/AndroidManifest.xml" \
+		-xml "$(projectLocationOnWindows)/xml" \
+		-java "$(projectLocationOnWindows)/java"
 
 bustler-on-unix:
 	go run build.go \
-		-sdk "$$sdkLocationOnUnix" \
-		-manifest "$$projectLocationOnUnix/AndroidManifest.xml" \
-		-xml "$$projectLocationOnUnix/xml" \
-		-java "$$projectLocationOnUnix/java"
+		-sdk "$(sdkLocationOnUnix)" \
+		-manifest "$(projectLocationOnUnix)/AndroidManifest.xml" \
+		-xml "$(projectLocationOnUnix)/xml" \
+		-java "$(projectLocationOnUnix)/java"

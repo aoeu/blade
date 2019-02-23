@@ -41,6 +41,7 @@ func main() {
 	flag.StringVar(&args.javaSourcesFilepath, "java", "java", javaDesc)
 	flag.StringVar(&args.outputDir, "out", "", outDesc)
 	flag.Parse()
+	fmt.Println("aoeu", args.javaSourcesFilepath, args.xmlResourcesFilepath)
 	if args.androidHome == "" {
 		var envExists bool
 		args.androidHome, envExists = os.LookupEnv("ANDROID_HOME")
@@ -57,7 +58,7 @@ func main() {
 	}
 	p, err := filepath.Abs(args.androidManifestFilepath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could find AndroidManifest.xml at filepath '%v' due to error: '%v'\n", args.androidManifestFilepath, err)
+		fmt.Fprintf(os.Stderr, "could not find AndroidManifest.xml at filepath '%v' due to error: '%v'\n", args.androidManifestFilepath, err)
 		os.Exit(1)
 	} else {
 		args.androidManifestFilepath = p
@@ -144,7 +145,7 @@ func (t toolchain) createUnalignedAndroidApplicationPackage(androidManifestFilep
 
 }
 func (t toolchain) translateJavaVirtualMachineMBytecodeToAndroidRuntimeBytecode(outputDexFilepath, outputDirForBytecode string) error {
-	return t.run(fmt.Sprintf("%v --dex --output %v %v", t.dxBin, outputDexFilepath, outputDirForBytecode))
+	return t.run(fmt.Sprintf("%v --dex --min-sdk-version=26 --output %v %v", t.dxBin, outputDexFilepath, outputDirForBytecode))
 }
 
 func (t toolchain) compileJavaSourceFilesToJavaVirtualMachineBytecode(javaSourcesFilepath, outputDirForGeneratedSourceFiles, outputDirForBytecode string) error {
@@ -157,7 +158,7 @@ func (t toolchain) compileJavaSourceFilesToJavaVirtualMachineBytecode(javaSource
 		return fmt.Errorf("could not find java source files to compile due to error: %v", err)
 	}
 	javaFiles := strings.Join(append(j, jj...), " ")
-	return t.run(fmt.Sprintf("javac -classpath %v -sourcepath %v -d %v -target 1.7 -source 1.7 %v", t.androidLib, javaSourcesFilepath+":"+outputDirForGeneratedSourceFiles, outputDirForBytecode, javaFiles))
+	return t.run(fmt.Sprintf("javac -classpath %v -sourcepath %v -d %v -target 1.8 -source 1.8 %v", t.androidLib, javaSourcesFilepath+":"+outputDirForGeneratedSourceFiles, outputDirForBytecode, javaFiles))
 }
 
 var javaFilename = regexp.MustCompile(`.*\.java$`)
@@ -275,8 +276,8 @@ func newToolchain(SDKPath string) (toolchain, error) {
 	if err != nil {
 		return t, fmt.Errorf("could not find platforms under '%v' due to error: %v", p, err)
 	}
-	if len(ff) > 1 {
-		return t, fmt.Errorf("no platforms found under '%v'", p)
+	if len(ff) < 1 {
+		return t, fmt.Errorf("no platforms found under '%v'", len(ff))
 	}
 	indexOfMostRecentBuildToolsVersion := len(ff) - 1
 	t.buildTools, err = filepath.Abs(p + "/" + ff[indexOfMostRecentBuildToolsVersion].Name())
@@ -299,8 +300,8 @@ func newToolchain(SDKPath string) (toolchain, error) {
 	if err != nil {
 		return t, fmt.Errorf("could not find platforms under '%v' due to error: %v", p, err)
 	}
-	if len(ff) > 1 {
-		return t, fmt.Errorf("no platforms found under '%v'", p)
+	if len(ff) < 1 {
+		return t, fmt.Errorf("no contents found in platform dir found under '%v'", d.Name())
 	}
 
 	indexOfMostRecentPlatformVersion := len(ff) - 1
