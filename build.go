@@ -66,7 +66,7 @@ func main() {
 
 	p, err = filepath.Abs(args.outputDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not locate output directory at filepath '%v' due to error: %v\n", args.outputDir, err)
+		fmt.Fprintf(os.Stderr, "could not locate output directory at filepath '%v' due to error: %v\n", args.outputDir, err)
 	} else {
 		args.outputDir = p
 	}
@@ -75,46 +75,46 @@ func main() {
 
 	t, err := newToolchain(args.androidHome)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not ascertain toolchain due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not ascertain toolchain due to error: %v\n", err)
 		os.Exit(1)
 	}
 	tmpDirs := []string{outputDirForGeneratedSourceFiles, outputDirForBytecode}
 	if err := makeOutputDirs(tmpDirs...); err != nil {
-		fmt.Fprintf(os.Stderr, "Could not create output directories due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not create output directories due to error: %v\n", err)
 		os.Exit(1)
 	}
 	if err = t.generateJavaFileForAndroidResources(args.outputDir+"/"+outputDirForGeneratedSourceFiles, args.androidManifestFilepath, args.xmlResourcesFilepath); err != nil {
-		fmt.Fprintf(os.Stderr, "Could not create Java file from Android XML resources files due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not create Java file from Android XML resources files due to error: %v\n", err)
 		os.Exit(1)
 	}
 
 	err = t.compileJavaSourceFilesToJavaVirtualMachineBytecode(args.javaSourcesFilepath, outputDirForGeneratedSourceFiles, outputDirForBytecode)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not compile java source files to bytecode due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not compile java source files to bytecode due to error: %v\n", err)
 		os.Exit(1)
 	}
 
 	err = t.translateJavaVirtualMachineMBytecodeToAndroidRuntimeBytecode(outputDexFilepath, outputDirForBytecode)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not translate bytecode with dexer due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not translate bytecode with dexer due to error: %v\n", err)
 		os.Exit(1)
 	}
 
 	err = t.createUnalignedAndroidApplicationPackage(args.androidManifestFilepath, args.xmlResourcesFilepath, filepathOfUnalignedAPK)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not create unaligned APK file due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not create unaligned APK file due to error: %v\n", err)
 		os.Exit(1)
 	}
 
 	err = t.addAndroidRuntimeBytecodeToAndroidApplicationPackage(filepathOfUnalignedAPK, outputDexFilepath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not add android runtime bytecode to APK due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not add android runtime bytecode to APK due to error: %v\n", err)
 		os.Exit(1)
 	}
 
 	err = t.signAndroidApplicationPackageWithDebugKey(filepathOfUnalignedAPK)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not sign APK due to error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not sign APK due to error: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -151,11 +151,11 @@ func (t toolchain) translateJavaVirtualMachineMBytecodeToAndroidRuntimeBytecode(
 func (t toolchain) compileJavaSourceFilesToJavaVirtualMachineBytecode(javaSourcesFilepath, outputDirForGeneratedSourceFiles, outputDirForBytecode string) error {
 	j, err := findJavaSourceFiles(javaSourcesFilepath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not find java source files to compile due to error: %v", err))
+		return errors.New(fmt.Sprintf("could not find java source files to compile due to error: %v", err))
 	}
 	jj, err := findJavaSourceFiles(outputDirForGeneratedSourceFiles)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not find java source files to compile due to error: %v", err))
+		return errors.New(fmt.Sprintf("could not find java source files to compile due to error: %v", err))
 	}
 	javaFiles := strings.Join(append(j, jj...), " ")
 	return t.run(fmt.Sprintf("javac -classpath %v -sourcepath %v -d %v -target 1.7 -source 1.7 %v", t.androidLib, javaSourcesFilepath+":"+outputDirForGeneratedSourceFiles, outputDirForBytecode, javaFiles))
@@ -177,7 +177,7 @@ func findJavaSourceFiles(rootDir string) ([]string, error) {
 		return nil
 	})
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Received error when finding Java source files under '%v' : %v\n", rootDir, err))
+		err = errors.New(fmt.Sprintf("received error when finding Java source files under '%v' : %v\n", rootDir, err))
 	}
 	return paths, err
 }
@@ -213,7 +213,7 @@ func (t toolchain) run(command string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return errors.New(fmt.Sprintf("Error when running command %v : %v\n", command, err))
+		return errors.New(fmt.Sprintf("error when running command %v : %v\n", command, err))
 	}
 	return nil
 }
@@ -224,11 +224,11 @@ func remove(paths ...string) error {
 	for _, s := range paths {
 		f, err := os.Stat(s)
 		if err != nil {
-			return errors.New(fmt.Sprintf("Could not stat file at '%v' due to error: %v\n", s, err))
+			return errors.New(fmt.Sprintf("could not stat file at '%v' due to error: %v\n", s, err))
 		}
 		if f.IsDir() {
 			if err := os.RemoveAll(s); err != nil {
-				return errors.New(fmt.Sprintf("Could not remove directory at '%v' due to error: %v\n", s, err))
+				return errors.New(fmt.Sprintf("could not remove directory at '%v' due to error: %v\n", s, err))
 			}
 		} else if err := os.Remove(s); err != nil {
 			return err
@@ -260,72 +260,72 @@ func newToolchain(SDKPath string) (toolchain, error) {
 	var err error
 	t.sdk, err = filepath.Abs(SDKPath)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("No valid directory has been found as $ANDROID_HOME due to error: %v", err))
+		return t, errors.New(fmt.Sprintf("no valid directory has been found as $ANDROID_HOME due to error: %v", err))
 	}
 
 	p := t.sdk + "/build-tools"
 	_, err = filepath.Abs(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("No build-tools directory found under '%v' due to error: %v", p, err))
+		return t, errors.New(fmt.Sprintf("no build-tools directory found under '%v' due to error: %v", p, err))
 	}
 	d, err := os.Open(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find build-tools found under '%v' due to error: %v", p, err))
+		return t, errors.New(fmt.Sprintf("could not find build-tools found under '%v' due to error: %v", p, err))
 	}
 	ff, err := d.Readdir(0)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find platforms under '%v' due to error: %v", p, err))
+		return t, errors.New(fmt.Sprintf("could not find platforms under '%v' due to error: %v", p, err))
 	}
 	if len(ff) > 1 {
-		return t, errors.New(fmt.Sprintf("No platforms found under '%v'", p))
+		return t, errors.New(fmt.Sprintf("no platforms found under '%v'", p))
 	}
 	indexOfMostRecentBuildToolsVersion := len(ff) - 1
 	t.buildTools, err = filepath.Abs(p + "/" + ff[indexOfMostRecentBuildToolsVersion].Name())
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Received error when selecting most modern build-tools version: '%v'", err))
+		return t, errors.New(fmt.Sprintf("received error when selecting most modern build-tools version: '%v'", err))
 	}
 
 	p = t.sdk + "/platforms"
 	_, err = filepath.Abs(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("No valid platform found under '%v' due to error: %v", p, err))
+		return t, errors.New(fmt.Sprintf("no valid platform found under '%v' due to error: %v", p, err))
 	}
 
 	d, err = os.Open(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find platforms under '%v' due to error: %v", p, err))
+		return t, errors.New(fmt.Sprintf("could not find platforms under '%v' due to error: %v", p, err))
 	}
 
 	ff, err = d.Readdir(0)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find platforms under '%v' due to error: %v", p, err))
+		return t, errors.New(fmt.Sprintf("could not find platforms under '%v' due to error: %v", p, err))
 	}
 	if len(ff) > 1 {
-		return t, errors.New(fmt.Sprintf("No platforms found under '%v'", p))
+		return t, errors.New(fmt.Sprintf("no platforms found under '%v'", p))
 	}
 
 	indexOfMostRecentPlatformVersion := len(ff) - 1
 	t.platform, err = filepath.Abs(p + "/" + ff[indexOfMostRecentPlatformVersion].Name())
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Received error when selecting most modern platform: '%v'", err))
+		return t, errors.New(fmt.Sprintf("received error when selecting most modern platform: '%v'", err))
 	}
 
 	p = t.platform + "/android.jar"
 	t.androidLib, err = filepath.Abs(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find android.jar library at path '%v' due to error: '%v'", err))
+		return t, errors.New(fmt.Sprintf("could not find android.jar library at path '%v' due to error: '%v'", err))
 	}
 
 	p = t.buildTools + "/aapt"
 	t.aaptBin, err = filepath.Abs(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find aapt binary at path '%v' due to error: '%v'", err))
+		return t, errors.New(fmt.Sprintf("could not find aapt binary at path '%v' due to error: '%v'", err))
 	}
 
 	p = t.buildTools + "/dx"
 	t.dxBin, err = filepath.Abs(p)
 	if err != nil {
-		return t, errors.New(fmt.Sprintf("Could not find dx binary at path '%v' due to error: '%v'", err))
+		return t, errors.New(fmt.Sprintf("could not find dx binary at path '%v' due to error: '%v'", err))
 	}
 	return t, nil
 }
