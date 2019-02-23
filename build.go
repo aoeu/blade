@@ -192,13 +192,17 @@ func (t toolchain) generateJavaFileForAndroidResources(outputDirForGeneratedSour
 	//	-f  force overwrite of existing files
 	//	-m  make package directories under location specified by -J
 	//	-J  specify where to output R.java resource constant definitions
+	J := outputDirForGeneratedSourceFiles
 	//	-M  specify full path to AndroidManifest.xml to include in zip
+	M := manifestFilepath
 	//	-S  directory in which to find resources.  Multiple directories will be scanned
 	//		and the first match found (left to right) will take precedence.
+	S := resourcesFilepath
 	//	-I	add an existing package to base include set
+	I := t.androidLib
 	//
 	// aapt package -f -m -J "$outputDirForGeneratedSourceFiles" -M "$manifestFilepath" -S "$resourcesFilepath" -I "$androidLib"
-	return t.run(fmt.Sprintf("%v package -f -m -J %v -M %v -S %v -I %v", t.aaptBin, outputDirForGeneratedSourceFiles, manifestFilepath, resourcesFilepath, t.androidLib))
+	return t.run(fmt.Sprintf("%v package -f -m -J %v -M %v -S %v -I %v", t.aaptBin, J, M, S, I))
 
 }
 
