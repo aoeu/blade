@@ -71,8 +71,6 @@ func main() {
 		args.outputDir = p
 	}
 
-	// sdkmanager --install 'build-tools;28.0.3' 'platforms;android-28'
-
 	t, err := newToolchain(args.androidHome)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not ascertain toolchain due to error: %v\n", err)
@@ -263,7 +261,15 @@ func newToolchain(SDKPath string) (toolchain, error) {
 		return t, fmt.Errorf("no valid directory has been found as $ANDROID_HOME due to error: %v", err)
 	}
 
-	p := t.sdk + "/build-tools"
+	p := t.sdk + "/tools"
+	_, err = filepath.Abs(p)
+	if err != nil {
+		s := fmt.Sprintf("could not find tools directory due to error: %v", err)
+		s = fmt.Sprintf("%v\nthis may mean the Android SDK has not been installed", s)
+		return t, fmt.Errorf("%v\nvisit developer.android.com to install command-line-only dev tools", s)
+	}
+
+	p = t.sdk + "/build-tools"
 	_, err = filepath.Abs(p)
 	if err != nil {
 		return t, fmt.Errorf("no build-tools directory found under '%v' due to error: %v", p, err)
@@ -274,10 +280,10 @@ func newToolchain(SDKPath string) (toolchain, error) {
 	}
 	ff, err := d.Readdir(0)
 	if err != nil {
-		return t, fmt.Errorf("could not find platforms under '%v' due to error: %v", p, err)
+		return t, fmt.Errorf("could not read build-tools dir under '%v' due to error: %v", p, err)
 	}
 	if len(ff) < 1 {
-		return t, fmt.Errorf("no platforms found under '%v'", len(ff))
+		return t, fmt.Errorf("no build tools found under '%v'", len(ff))
 	}
 	indexOfMostRecentBuildToolsVersion := len(ff) - 1
 	t.buildTools, err = filepath.Abs(p + "/" + ff[indexOfMostRecentBuildToolsVersion].Name())
@@ -313,19 +319,19 @@ func newToolchain(SDKPath string) (toolchain, error) {
 	p = t.platform + "/android.jar"
 	t.androidLib, err = filepath.Abs(p)
 	if err != nil {
-		return t, fmt.Errorf("could not find android.jar library at path '%v' due to error: '%v'", err)
+		return t, fmt.Errorf("could not find android.jar library at path '%v' due to error: '%v'", p, err)
 	}
 
 	p = t.buildTools + "/aapt"
 	t.aaptBin, err = filepath.Abs(p)
 	if err != nil {
-		return t, fmt.Errorf("could not find aapt binary at path '%v' due to error: '%v'", err)
+		return t, fmt.Errorf("could not find aapt binary at path '%v' due to error: '%v'", p, err)
 	}
 
 	p = t.buildTools + "/dx"
 	t.dxBin, err = filepath.Abs(p)
 	if err != nil {
-		return t, fmt.Errorf("could not find dx binary at path '%v' due to error: '%v'", err)
+		return t, fmt.Errorf("could not find dx binary at path '%v' due to error: '%v'", p, err)
 	}
 	return t, nil
 }
