@@ -67,6 +67,7 @@ func main() {
 	p, err = filepath.Abs(args.outputDir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not locate output directory at filepath '%v' due to error: %v\n", args.outputDir, err)
+		os.Exit(1)
 	} else {
 		args.outputDir = p
 	}
