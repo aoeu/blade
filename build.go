@@ -21,9 +21,9 @@ const (
 // Descriptions of flags with corresponding names:
 const (
 	sdkDesc      = "The location of the Android SDK to use in lieu of the environment variable $ANDROID_HOME (default)"
-	manifestDesc = "The location of the AndroidManifest.xml of the app to build in lieu of the current directory (default)"
-	xmlDesc      = "The parent-folder location of XML resources files (commonly named 'res') to use in lieu of a folder named 'xml' within the current directory (default)"
-	javaDesc     = "The parent-folder location Java source files for the app to use in lieu of a folder named 'java' within the current directory (default)"
+	manifestDesc = "The location of the AndroidManifest.xml of the app to build in lieu of the current directory"
+	xmlDesc      = "The parent-folder location of XML resources files (commonly named 'res') for the app to be bulit with"
+	javaDesc     = "The parent-folder location Java source files for the app to be built with"
 	outDesc      = "The directory to output temporary built artifacts and final APK file, in lieu of the current directory"
 )
 
