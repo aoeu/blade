@@ -72,6 +72,28 @@ func main() {
 		args.outputDir = p
 	}
 
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not locate user's home directory to find signing keystore: %v", err)
+		os.Exit(1)
+	}
+	keystorePath := fmt.Sprintf("%v/.android/debug.keystore", home)
+	info, err := os.Stat(keystorePath)
+	switch {
+	case err != nil:
+		fmt.Fprintf(os.Stderr, "could not find signing keystore: '%v'", err)
+		fmt.Fprintln(os.Stderr, keystoreCreationCmd)
+		os.Exit(1)
+	case info.IsDir():
+		fmt.Fprintf(os.Stderr, "expected signing keystore file at '%v' but was directory", keystorePath)
+		fmt.Fprintln(os.Stderr, keystoreCreationCmd)
+		os.Exit(1)
+	case info.Size() == 0:
+		fmt.Fprintf(os.Stderr, "signing keystore file at '%v' is empty", keystorePath )
+		fmt.Fprintln(os.Stderr, keystoreCreationCmd)
+		os.Exit(1)
+	}
+
 	t, err := newToolchain(args.androidHome)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not ascertain toolchain due to error: %v\n", err)
@@ -361,3 +383,19 @@ func (t *toolchain) initPlatforms() (err error) {
 	}
 	return nil
 }
+
+
+const (
+
+	keystoreCreationCmd = `
+try (modifying if wanted and) executing:
+$ keytool -genkey -v \
+	-keystore $HOME/.android/debug.keystore \
+	-alias androiddebugkey \
+	-storepass android \
+	-keypass android \
+	-keyalg RSA \
+	-validity 14000 \
+	-dname "CN=Rick Deckard, OU=Replicant Detection Division, O=LAPD, L=Los Angeles, S=California, C=US"
+`
+)
