@@ -165,8 +165,27 @@ func (t toolchain) createUnalignedAndroidApplicationPackage(androidManifestFilep
 	return t.run(fmt.Sprintf("%v package -f -M %v -S %v -I %v -F %v", t.aaptBin, androidManifestFilepath, xmlResourcesFilepath, t.androidLib, filepathOfUnalignedAPK))
 
 }
+
+var classFilename = regexp.MustCompile(`.*\.class$`)
+
 func (t toolchain) translateJavaVirtualMachineMBytecodeToAndroidRuntimeBytecode(outputDexFilepath, outputDirForBytecode string) error {
-	return t.run(fmt.Sprintf("%v --dex --min-sdk-version=26 --output %v %v", t.dxBin, outputDexFilepath, outputDirForBytecode))
+	classFiles := make([]string, 0)
+	err := filepath.Walk(outputDirForBytecode, func(path string, info os.FileInfo, err error) error {
+		switch {
+		case err != nil:
+			return err
+		case info.IsDir():
+		case classFilename.MatchString(info.Name()):
+			classFiles = append(classFiles, path)
+		}
+		return nil
+	})
+	if err != nil {
+		s := "could not walk dir '%v' for a list of class files due to error: %v"
+		return fmt.Errorf(s, outputDirForBytecode, err)
+	}
+	s := strings.Join(classFiles, " ")
+	return t.run(fmt.Sprintf("%v %v", t.d8Bin, s))
 }
 
 func (t toolchain) compileJavaSourceFilesToJavaVirtualMachineBytecode(javaSourcesFilepath, outputDirForGeneratedSourceFiles, outputDirForBytecode string) error {
@@ -273,7 +292,7 @@ type toolchain struct {
 	platform   string
 	androidLib string
 	aaptBin    string
-	dxBin      string
+	d8Bin      string
 }
 
 func newToolchain(SDKPath string) (*toolchain, error) {
@@ -342,10 +361,10 @@ func (t *toolchain) initBuildTools() (err error) {
 		return fmt.Errorf("could not find aapt binary at path '%v' due to error: '%v'", p, err)
 	}
 
-	p = t.buildTools + "/dx"
-	t.dxBin, err = filepath.Abs(p)
+	p = t.buildTools + "/d8"
+	t.d8Bin, err = filepath.Abs(p)
 	if err != nil {
-		return fmt.Errorf("could not find dx binary at path '%v' due to error: '%v'", p, err)
+		return fmt.Errorf("could not find d8 binary at path '%v' due to error: '%v'", p, err)
 	}
 	return nil
 }
